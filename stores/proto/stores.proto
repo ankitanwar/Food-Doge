@@ -1,0 +1,124 @@
+syntax="proto3";
+
+package stores;
+
+option go_package=".;storespb";
+
+message createStoreRequest{
+    string storeName=1;
+    string street=2;
+    string state=3;
+    string country=4;
+    string phoneNumber=5;
+    string description=6;
+    int64 pincode=7;
+    string userID=8;
+}
+
+message createStoreResponse{
+    string storeID=1;
+    createStoreRequest addedStore=2;
+}
+
+message exploreOutletsRequest{
+    string address=1;
+}
+
+message exporeOutletsResponse{
+    string storeName=1;
+    string street=2;
+    string state=3;
+    string description=4;
+    string storeID=5;
+
+}
+
+message orderFoodRequest{
+    string itemID=1;
+    string storeID=2;
+    string customerHouseNo=3;
+    string customerStreet=4;
+    string cutomerState=5;
+    string customerPhoneNumber=6;
+    int64 pincode=7;
+}
+
+message orderFoodRespomse{
+    string deliveryTime=1;
+    int64 price=2;
+}
+
+message addItemsInStoreRequest{
+    string itemName=1;
+    string description=2;
+    bool vegetarian=3;
+    int64 price=4;
+    string userID=5;
+    string storeID=6;
+}
+
+message addItemsInStoreResponse{
+    string message=1;
+}
+
+message filterOutletsRequest{
+    string address=1;
+    int64 price=2;
+    string cuisine=3;
+    bool vegetarian=4;
+    string name=5;
+
+}
+
+message filterOutletsResponse{
+    exporeOutletsResponse filtered=1;
+}
+
+message updateItemRequest{
+    string itemID=1;
+    string storeID=2;
+    string userID=3;
+    addItemsInStoreRequest UpdateItemDetail=4;
+
+}
+message updateItemResponse{
+    addItemsInStoreResponse UpdateItemDetail=1;
+}
+
+message updateStoreRequest{
+    createStoreRequest updatedDetails=1;
+}
+
+message updateStoreResponse{
+    createStoreResponse updatedDetails=1;
+}
+message deleteStoreRequest{
+    string storeID=1;
+    string userID=2;
+}
+
+message deleteStoreResponse{
+    string message=1;
+}
+message deleteItemRequest{
+    string itemID=1;
+    string storeID=2;
+    string userID=3;
+}
+
+message deleteItemResponse{
+    string message=1;
+}
+
+service storesService{
+    rpc CreateStore(createStoreRequest) returns (createStoreResponse);
+    rpc explore(exploreOutletsRequest) returns (stream exporeOutletsResponse);
+    rpc OrderFood (orderFoodRequest) returns (orderFoodRespomse);
+    rpc UpdateStoreDetails (updateStoreRequest) returns (updateStoreResponse);
+    rpc UpdateItemDetail (updateItemRequest) returns (updateItemResponse);
+    rpc Filter (filterOutletsRequest) returns (stream filterOutletsResponse);
+    rpc NewItem (addItemsInStoreRequest) returns (addItemsInStoreResponse);
+    rpc DeleteItem (deleteItemRequest) returns (deleteItemResponse);
+    rpc deleteStore (deleteStoreRequest) returns (deleteStoreResponse);
+
+}
