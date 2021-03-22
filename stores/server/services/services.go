@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	storespb "github.com/ankitanwar/Food-Doge/stores/proto"
 	db "github.com/ankitanwar/Food-Doge/stores/server/database"
@@ -20,6 +21,8 @@ type StoreService struct {
 }
 
 func (s *StoreService) CreateStore(ctx context.Context, req *storespb.CreateStoreRequest) (*storespb.CreateStoreResponse, error) {
+	fmt.Println("the value of userID is", req.UserID)
+	products := []domain.Items{}
 	storeDetails := &domain.Store{
 		StoreName:   req.StoreName,
 		State:       req.State,
@@ -29,6 +32,7 @@ func (s *StoreService) CreateStore(ctx context.Context, req *storespb.CreateStor
 		Description: req.Description,
 		Pincode:     req.Pincode,
 		StoreOwner:  req.UserID,
+		Products:    products,
 	}
 	err := storeDetails.CheckForError()
 	if err != nil {

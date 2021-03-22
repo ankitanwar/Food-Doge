@@ -3,15 +3,15 @@ package domain
 import (
 	"errors"
 
-	"go.mongodb.org/mongo-driver/x/mongo/driver/uuid"
+	uuid "github.com/uuid"
 )
 
 type Items struct {
-	ItemID      uuid.UUID `json:"itemID" bson:"_id,omitempty"`
-	ItemName    string    `json:"itemName" bson:"itemName"`
-	Description string    `json:"description" bson:"description"`
-	Vegetarain  bool      `json:"vegetarian" bson:"vegetarian"`
-	Price       int64     `json:"price" bson:"price"`
+	ItemID      string `json:"itemID" bson:"_id,omitempty"`
+	ItemName    string `json:"itemName" bson:"itemName"`
+	Description string `json:"description" bson:"description"`
+	Vegetarain  bool   `json:"vegetarian" bson:"vegetarian"`
+	Price       int64  `json:"price" bson:"price"`
 }
 
 func (details *Items) CheckItemDetails() error {
@@ -23,10 +23,11 @@ func (details *Items) CheckItemDetails() error {
 	return nil
 }
 
-func (details *Items) GenerateUniqueID() (uuid.UUID, error) {
-	id, err := uuid.New()
+func (details *Items) GenerateUniqueID() (string, error) {
+	id, err := uuid.NewV4()
 	if err != nil {
-		return id, err
+		return "", err
 	}
-	return id, nil
+	stringID := id.String()
+	return stringID, nil
 }

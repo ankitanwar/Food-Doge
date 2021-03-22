@@ -33,7 +33,7 @@ func (StoreDB *StoreDB) DeleteStore(storeID primitive.ObjectID) error {
 
 func (itemsDb *ItemsDB) DeleteItem(storeID primitive.ObjectID, userID, itemID string) error {
 	filter := bson.M{"_id": storeID, "userID": userID}
-	remove := bson.M{"$pull": bson.M{"products": bson.M{"itemID": itemID}}}
+	remove := bson.M{"$pull": bson.M{"products": bson.M{"_id": itemID}}}
 	_, err := collection.UpdateOne(context.Background(), filter, remove)
 	if err != nil {
 		return err
