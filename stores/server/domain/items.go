@@ -7,8 +7,9 @@ import (
 )
 
 type Items struct {
-	ItemID      string `json:"itemID" bson:"_id,omitempty"`
+	ItemID      string `json:"itemID" bson:"itemID,omitempty"`
 	ItemName    string `json:"itemName" bson:"itemName"`
+	Cuisine     string `json:"cuisine" bson:"cuisine"`
 	Description string `json:"description" bson:"description"`
 	Vegetarain  bool   `json:"vegetarian" bson:"vegetarian"`
 	Price       int64  `json:"price" bson:"price"`

@@ -4,6 +4,14 @@ package stores;
 
 option go_package=".;storespb";
 
+message food{
+    string itemName=1;
+    string description=2;
+    bool vegetarian=3;
+    int64 price=4;
+    string cuisine=5;
+}
+
 message createStoreRequest{
     string storeName=1;
     string street=2;
@@ -36,6 +44,12 @@ message exporeOutletsResponse{
 message orderFoodRequest{
     string itemID=1;
     string storeID=2;
+}
+
+message orderFoodRespomse{
+    string deliveryTime=1;
+    string itemName=8;
+    int64 price=2;
     string customerHouseNo=3;
     string customerStreet=4;
     string cutomerState=5;
@@ -43,35 +57,27 @@ message orderFoodRequest{
     int64 pincode=7;
 }
 
-message orderFoodRespomse{
-    string deliveryTime=1;
-    int64 price=2;
-}
-
 message addItemsInStoreRequest{
-    string itemName=1;
-    string description=2;
-    bool vegetarian=3;
-    int64 price=4;
-    string userID=5;
-    string storeID=6;
+    food Details=1;
+    string userID=2;
+    string storeID=3;
 }
 
 message addItemsInStoreResponse{
     string message=1;
 }
 
-message filterOutletsRequest{
-    string address=1;
+message filterFoodRequest{
     int64 price=2;
     string cuisine=3;
     bool vegetarian=4;
     string name=5;
+    string storeID=6;
 
 }
 
-message filterOutletsResponse{
-    exporeOutletsResponse filtered=1;
+message filterFoodResponse{
+    food filtered=1;
 }
 
 message updateItemRequest{
@@ -86,7 +92,8 @@ message updateItemResponse{
 }
 
 message updateStoreRequest{
-    createStoreRequest updatedDetails=1;
+    string storeID=1;
+    createStoreRequest updatedDetails=2;
 }
 
 message updateStoreResponse{
@@ -110,15 +117,32 @@ message deleteItemResponse{
     string message=1;
 }
 
+message viewParticularStoreRequest{
+    string storeID=1;
+}
+message viewParticularStoreResponse{
+    string itemID=1;
+    food foods=2;
+}
+message getItemDetailsRequest{
+    string storeID=1;
+    string itemID=2;
+}
+message getItemDetailsResponse{
+    food details=1;
+}
+
 service storesService{
     rpc CreateStore(createStoreRequest) returns (createStoreResponse);
     rpc explore(exploreOutletsRequest) returns (stream exporeOutletsResponse);
     rpc OrderFood (orderFoodRequest) returns (orderFoodRespomse);
     rpc UpdateStoreDetails (updateStoreRequest) returns (updateStoreResponse);
     rpc UpdateItemDetail (updateItemRequest) returns (updateItemResponse);
-    rpc Filter (filterOutletsRequest) returns (stream filterOutletsResponse);
+    rpc FilterDish (filterFoodRequest) returns (stream filterFoodResponse);
     rpc NewItem (addItemsInStoreRequest) returns (addItemsInStoreResponse);
     rpc DeleteItem (deleteItemRequest) returns (deleteItemResponse);
     rpc deleteStore (deleteStoreRequest) returns (deleteStoreResponse);
+    rpc ViewItemOfStore (viewParticularStoreRequest) returns (stream viewParticularStoreResponse);
+    rpc GetItemDetail (getItemDetailsRequest)returns (getItemDetailsResponse);
 
 }
