@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/ankitanwar/Food-Doge/cart/services"
-	oauth "github.com/ankitanwar/Shop-PopCorn/Middleware/oAuth"
-	"github.com/ankitanwar/Shop-PopCorn/Middleware/user"
+	auth "github.com/ankitanwar/Food-Doge/middleware/auth"
+	user "github.com/ankitanwar/Food-Doge/middleware/user"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,7 +16,7 @@ func getCallerID(request *http.Request) string {
 
 //AddToCart : To add the given item into the cart
 func AddToCart(c *gin.Context) {
-	if err := oauth.AuthenticateRequest(c.Request); err != nil {
+	if err := auth.AuthenticateRequest(c.Request); err != nil {
 		c.JSON(err.Status, err)
 		return
 	}
@@ -35,7 +35,7 @@ func AddToCart(c *gin.Context) {
 
 //RemoveFromCart : To remove the given item from the cart
 func RemoveFromCart(c *gin.Context) {
-	if err := oauth.AuthenticateRequest(c.Request); err != nil {
+	if err := auth.AuthenticateRequest(c.Request); err != nil {
 		c.JSON(err.Status, err.Message)
 		return
 	}
@@ -52,7 +52,7 @@ func RemoveFromCart(c *gin.Context) {
 
 //ViewCart : To view the cart of the particular user
 func ViewCart(c *gin.Context) {
-	if err := oauth.AuthenticateRequest(c.Request); err != nil {
+	if err := auth.AuthenticateRequest(c.Request); err != nil {
 		c.JSON(err.Status, err.Message)
 		return
 	}
@@ -68,10 +68,7 @@ func ViewCart(c *gin.Context) {
 
 //Checkout : To checkout all the items from the cart
 func Checkout(c *gin.Context) {
-	// if err := oauth.AuthenticateRequest(c.Request); err != nil {
-	// 	c.JSON(err.Status, err)
-	// 	return
-	// }
+	//No need To verify The request because request will get verified in address service
 	addressID := c.Param("addressID")
 	address, err := user.GetUserAddress.GetAddress(c.Request, addressID)
 	if err != nil {
