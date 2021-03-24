@@ -2,9 +2,8 @@ package db
 
 import (
 	"context"
-	"fmt"
 
-	"github.com/ankitanwar/Food-Doge/stores/server/domain"
+	"github.com/ankitanwar/Food-Doge/food/server/domain"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -43,18 +42,14 @@ func (itemdb *ItemsDB) FilterItems(storeID primitive.ObjectID, price int64, cuis
 	return result, err
 }
 
-func (Itemsdb *ItemsDB) FetchAllItems(storeID primitive.ObjectID) (*mongo.Cursor, error) {
-	fmt.Println("The value of store id is", storeID)
+func (Itemsdb *ItemsDB) FetchAllItems(storeID primitive.ObjectID) *mongo.SingleResult {
 	filter := bson.M{"_id": storeID}
-	result, err := collection.Find(context.Background(), filter)
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
+	result := collection.FindOne(context.Background(), filter)
+	return result
 }
 
 func (item *ItemsDB) GetItemDetail(storeID primitive.ObjectID, itemID string) *mongo.SingleResult {
-	filter := bson.M{"_id": storeID, "prodcuts": bson.M{"itemID": itemID}}
+	filter := bson.M{"_id": storeID, "products.itemID": itemID}
 	result := collection.FindOne(context.Background(), filter)
 	return result
 }

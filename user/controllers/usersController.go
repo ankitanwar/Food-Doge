@@ -167,11 +167,11 @@ func AddAddress(c *gin.Context) {
 }
 
 func GetAddressWithID(c *gin.Context) {
-	err := auth.AuthenticateRequest(c.Request)
-	if err != nil {
-		c.JSON(err.Status, err.Message)
-		return
-	}
+	// err := auth.AuthenticateRequest(c.Request)
+	// if err != nil {
+	// 	c.JSON(err.Status, err.Message)
+	// 	return
+	// }
 	addressID := c.Param("addressID")
 	userID, err := getUserid(c.Request)
 	if err != nil {
@@ -185,4 +185,21 @@ func GetAddressWithID(c *gin.Context) {
 	}
 	c.JSON(http.StatusAccepted, response)
 	return
+}
+
+//RemoveAddress: To Remove the address of the given User
+func RemoveAddress(c *gin.Context) {
+	err := auth.AuthenticateRequest(c.Request)
+	if err != nil {
+		c.JSON(err.Status, err.Message)
+		return
+	}
+	userID, _ := getUserid(c.Request)
+	addressID := c.Param("addressID")
+	err = services.AddresService.RemoveAddress(userID, addressID)
+	if err != nil {
+		c.JSON(err.Status, err.Message)
+		return
+	}
+	c.JSON(http.StatusAccepted, "Address Has Been Removed Successfully")
 }

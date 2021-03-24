@@ -6,8 +6,9 @@ import (
 	"log"
 	"net/http"
 
-	connect "github.com/ankitanwar/Food-Doge/stores/client/connect"
-	storespb "github.com/ankitanwar/Food-Doge/stores/proto"
+	connect "github.com/ankitanwar/Food-Doge/food/client/connect"
+	foodpb "github.com/ankitanwar/Food-Doge/food/proto"
+	orders "github.com/ankitanwar/Food-Doge/middleware/orders"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,11 +25,12 @@ type foodControllerInterface interface {
 	OrderFoodItem(c *gin.Context)
 	GetItemDetails(c *gin.Context)
 	GetAllItems(c *gin.Context)
+	CheckOut(c *gin.Context)
 }
 
 func (controller *foodControllerSturct) FilterFood(c *gin.Context) {
 	storeID := c.Param("storeID")
-	request := &storespb.FilterFoodRequest{}
+	request := &foodpb.FilterFoodRequest{}
 	err := c.ShouldBindJSON(request)
 	request.StoreID = storeID
 	if err != nil {
@@ -56,11 +58,10 @@ func (controller *foodControllerSturct) FilterFood(c *gin.Context) {
 }
 
 func (controller *foodControllerSturct) AddNewItem(c *gin.Context) {
-	//need to implement authenctication
 	userID := getUserID(c.Request)
 	storeID := c.Param("storeID")
-	itemDetails := &storespb.Food{}
-	request := &storespb.AddItemsInStoreRequest{UserID: userID, StoreID: storeID}
+	itemDetails := &foodpb.Food{}
+	request := &foodpb.AddItemsInStoreRequest{UserID: userID, StoreID: storeID}
 	err := c.ShouldBindJSON(itemDetails)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err)
@@ -80,7 +81,7 @@ func (controller *foodControllerSturct) UpdateFoodDetails(c *gin.Context) {
 	userID := getUserID(c.Request)
 	storeID := c.Param("storeID")
 	itemID := c.Param("itemID")
-	request := &storespb.UpdateItemRequest{ItemID: itemID, StoreID: storeID, UserID: userID}
+	request := &foodpb.UpdateItemRequest{ItemID: itemID, StoreID: storeID, UserID: userID}
 	err := c.ShouldBindJSON(request)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err)
@@ -98,7 +99,7 @@ func (controller *foodControllerSturct) DeleteFoodItem(c *gin.Context) {
 	userID := getUserID(c.Request)
 	storeID := c.Param("storeID")
 	itemID := c.Param("itemID")
-	request := &storespb.DeleteItemRequest{ItemID: itemID, StoreID: storeID, UserID: userID}
+	request := &foodpb.DeleteItemRequest{ItemID: itemID, StoreID: storeID, UserID: userID}
 	response, err := connect.Client.DeleteItem(context.Background(), request)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
@@ -111,13 +112,18 @@ func (controller *foodControllerSturct) DeleteFoodItem(c *gin.Context) {
 func (controller *foodControllerSturct) OrderFoodItem(c *gin.Context) {
 	storeId := c.Param("storeID")
 	itemID := c.Param("itemID")
-	request := &storespb.OrderFoodRequest{
+	request := &foodpb.OrderFoodRequest{
 		StoreID: storeId,
 		ItemID:  itemID,
 	}
 	response, err := connect.Client.OrderFood(context.Background(), request)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, "Unable To Order The food")
+		return
+	}
+	informStoreErr := orders.PlaceOrders(c.Request, storeId, response)
+	if informStoreErr != nil {
+		c.JSON(informStoreErr.Status, informStoreErr.Message)
 		return
 	}
 	c.JSON(http.StatusAccepted, response)
@@ -128,7 +134,7 @@ func (controller *foodControllerSturct) OrderFoodItem(c *gin.Context) {
 func (controller *foodControllerSturct) GetItemDetails(c *gin.Context) {
 	storeID := c.Param("storeID")
 	itemID := c.Param("itemID")
-	details := &storespb.GetItemDetailsRequest{
+	details := &foodpb.GetItemDetailsRequest{
 		StoreID: storeID,
 		ItemID:  itemID,
 	}
@@ -147,7 +153,7 @@ func (controller *foodControllerSturct) GetAllItems(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, "Please Enter The Valid Store ID")
 		return
 	}
-	req := &storespb.ViewParticularStoreRequest{
+	req := &foodpb.ViewParticularStoreRequest{
 		StoreID: storeID,
 	}
 	response, err := connect.Client.ViewItemOfStore(context.Background(), req)
@@ -165,5 +171,17 @@ func (controller *foodControllerSturct) GetAllItems(c *gin.Context) {
 		}
 		c.JSON(http.StatusAccepted, details)
 	}
+
+}
+func (controller *foodControllerSturct) CheckOut(c *gin.Context) {
+	storeID := c.Param("storeID")
+	itemID := c.Param("itemID")
+	request := &foodpb.CheckOutRequest{ItemID: itemID, StoreID: storeID}
+	response, err := connect.Client.Checkout(context.Background(), request)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, "Unable To Checkout The Item")
+	}
+	c.JSON(http.StatusAccepted, response)
+	return
 
 }

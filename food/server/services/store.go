@@ -4,22 +4,22 @@ import (
 	"context"
 	"errors"
 
-	storespb "github.com/ankitanwar/Food-Doge/stores/proto"
-	db "github.com/ankitanwar/Food-Doge/stores/server/database"
-	"github.com/ankitanwar/Food-Doge/stores/server/domain"
+	foodpb "github.com/ankitanwar/Food-Doge/food/proto"
+	db "github.com/ankitanwar/Food-Doge/food/server/database"
+	"github.com/ankitanwar/Food-Doge/food/server/domain"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 var (
-	AvailableServices storespb.StoresServiceServer = &StoreService{}
-	storeDB                                        = &db.StoreDB{}
-	itemDB                                         = &db.ItemsDB{}
+	AvailableServices foodpb.StoresServiceServer = &FoodService{}
+	storeDB                                      = &db.StoreDB{}
+	itemDB                                       = &db.ItemsDB{}
 )
 
-type StoreService struct {
+type FoodService struct {
 }
 
-func (service *StoreService) CreateStore(ctx context.Context, req *storespb.CreateStoreRequest) (*storespb.CreateStoreResponse, error) {
+func (service *FoodService) CreateStore(ctx context.Context, req *foodpb.CreateStoreRequest) (*foodpb.CreateStoreResponse, error) {
 	products := []domain.Items{}
 	storeDetails := &domain.Store{
 		StoreName:   req.GetStoreName(),
@@ -41,22 +41,22 @@ func (service *StoreService) CreateStore(ctx context.Context, req *storespb.Crea
 		return nil, errors.New("Unable To Add The Store Into The Database")
 	}
 	storeID := res.InsertedID.(primitive.ObjectID).Hex()
-	response := &storespb.CreateStoreResponse{
+	response := &foodpb.CreateStoreResponse{
 		StoreID:    storeID,
 		AddedStore: req,
 	}
 	return response, nil
 
 }
-func (service *StoreService) Explore(req *storespb.ExploreOutletsRequest, stream storespb.StoresService_ExploreServer) error {
+func (service *FoodService) Explore(req *foodpb.ExploreOutletsRequest, stream foodpb.StoresService_ExploreServer) error {
 	return nil
 }
 
-func (service *StoreService) UpdateStoreDetails(ctx context.Context, req *storespb.UpdateStoreRequest) (*storespb.UpdateStoreResponse, error) {
+func (service *FoodService) UpdateStoreDetails(ctx context.Context, req *foodpb.UpdateStoreRequest) (*foodpb.UpdateStoreResponse, error) {
 	return nil, nil
 }
 
-func (service *StoreService) DeleteStore(ctx context.Context, req *storespb.DeleteStoreRequest) (*storespb.DeleteStoreResponse, error) {
+func (service *FoodService) DeleteStore(ctx context.Context, req *foodpb.DeleteStoreRequest) (*foodpb.DeleteStoreResponse, error) {
 	givenStoreID := req.GetStoreID()
 	storeID, err := primitive.ObjectIDFromHex(givenStoreID)
 	if err != nil {
@@ -66,7 +66,7 @@ func (service *StoreService) DeleteStore(ctx context.Context, req *storespb.Dele
 	if err != nil {
 		return nil, errors.New("Unable To Delete The Store")
 	}
-	response := &storespb.DeleteStoreResponse{
+	response := &foodpb.DeleteStoreResponse{
 		Message: "Store Has Been Removed Successfullly",
 	}
 	return response, nil

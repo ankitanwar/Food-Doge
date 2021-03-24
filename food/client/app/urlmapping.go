@@ -1,6 +1,6 @@
 package application
 
-import "github.com/ankitanwar/Food-Doge/stores/client/controllers"
+import "github.com/ankitanwar/Food-Doge/food/client/controllers"
 
 func UrlMapping() {
 	router.GET("/stores/:location", controllers.StoreController.ShowStores)
@@ -12,5 +12,7 @@ func UrlMapping() {
 	router.PATCH("/food/:storeID/:itemID/updateItem", controllers.FoodController.UpdateFoodDetails)
 	router.DELETE("/food/:storeID/:itemID", controllers.FoodController.DeleteFoodItem)
 	router.GET("/food/all/:storeID", controllers.FoodController.GetAllItems)
-	// router.POST("/food/buy/test/:storeID/:itemID/buy/deliver", controllers.FoodController.OrderFoodItem)
+	router.GET("/itemDetail/:storeID/:itemID", controllers.FoodController.GetItemDetails)
+	router.POST("/buy/food/:storeID/:itemID", controllers.FoodController.OrderFoodItem)
+	router.POST("/checkout/:storeID/:itemID", controllers.FoodController.CheckOut)
 }

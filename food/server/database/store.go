@@ -3,7 +3,7 @@ package db
 import (
 	"context"
 
-	"github.com/ankitanwar/Food-Doge/stores/server/domain"
+	"github.com/ankitanwar/Food-Doge/food/server/domain"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"

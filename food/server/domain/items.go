@@ -6,6 +6,10 @@ import (
 	uuid "github.com/uuid"
 )
 
+type ListALlProducts struct {
+	AllProducts []Items `json:"products" bson:"products"`
+}
+
 type Items struct {
 	ItemID      string `json:"itemID" bson:"itemID,omitempty"`
 	ItemName    string `json:"itemName" bson:"itemName"`

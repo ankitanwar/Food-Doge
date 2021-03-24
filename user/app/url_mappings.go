@@ -11,5 +11,6 @@ func mapUrls() {
 	router.GET("/user/address", controllers.GetAddress)
 	router.POST("/user/address", controllers.AddAddress)
 	router.POST("/user/verify", controllers.VerifyUser)
-	router.GET("/user/address/:addressID")
+	router.GET("/user/specificaddress/:addressID", controllers.GetAddressWithID)
+	router.DELETE("/user/address/:addressID", controllers.RemoveAddress)
 }

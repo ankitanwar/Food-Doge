@@ -55,16 +55,17 @@ func (userAddress *addressServiceStruct) RemoveAddress(userID string, addressID 
 
 func (userAddress *addressServiceStruct) GetAddressWithID(userID, addressID string) (*users.UserAddress, *errors.RestError) {
 	if addressID == "" {
-		return nil, errors.NewBadRequest("Please Enter The valid Address ID")
+		return nil, errors.NewBadRequest("InValid Address Id")
 	}
-	details := addressDB.UserSpecificAddress(userID, addressID)
-	if details == nil {
-		return nil, errors.NewBadRequest("Given Address Not Found In The Database")
-	}
-	address := &users.UserAddress{}
-	err := details.Decode(address)
+	addresses, err := addressDB.GetUserAddress(userID)
 	if err != nil {
-		return nil, errors.NewInternalServerError("Error While Decoding The Address")
+		return nil, errors.NewInternalServerError("Error While Fetching The Address")
 	}
-	return address, nil
+	for i := 0; i < len(addresses.List); i++ {
+		currentAddress := addresses.List[i]
+		if currentAddress.ID == addressID {
+			return &currentAddress, nil
+		}
+	}
+	return nil, errors.NewBadRequest("Address Not Found")
 }

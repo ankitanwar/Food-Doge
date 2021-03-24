@@ -3,7 +3,7 @@ package connect
 import (
 	"fmt"
 
-	storespb "github.com/ankitanwar/Food-Doge/stores/proto"
+	storespb "github.com/ankitanwar/Food-Doge/food/proto"
 	"google.golang.org/grpc"
 )
 

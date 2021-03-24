@@ -1,6 +1,10 @@
 package services
 
 import (
+	"fmt"
+	"net/http"
+	"time"
+
 	cartdatabase "github.com/ankitanwar/Food-Doge/cart/database"
 	domain "github.com/ankitanwar/Food-Doge/cart/domain"
 	product "github.com/ankitanwar/Food-Doge/middleware/Products"
@@ -8,16 +12,18 @@ import (
 )
 
 //AddToCart : To add the given product details into the cart of the given user
-func AddToCart(userID, itemID string, productDetails *product.ItemValue) *errors.RestError {
-	user := &domain.User{}
-	user.UserID = userID
-	item := &domain.Item{}
-	item.ItemID = itemID
-	item.Price = productDetails.Price
-	item.Title = productDetails.Title
-	saveToDB := cartdatabase.AddToCart(userID, *item)
-	if saveToDB != nil {
-		return saveToDB
+func AddToCart(userID, storeID, itemID string) *errors.RestError {
+	getItemDetails, err := product.ItemSerivce.GetItemDetails(storeID, itemID)
+	if err != nil {
+		return err
+	}
+	fmt.Println(getItemDetails)
+	details := getItemDetails.Detail
+	details.ItemID = itemID
+	details.StoreID = storeID
+	err = cartdatabase.AddToCart(userID, details)
+	if err != nil {
+		return err
 	}
 	return nil
 
@@ -33,15 +39,34 @@ func RemoveFromCart(userID, itemID string) *errors.RestError {
 }
 
 //ViewCart : To view all the items in the cart
-func ViewCart(userID string) (*[]domain.Item, *errors.RestError) {
+func ViewCart(userID string) (*domain.Details, *errors.RestError) {
 	userCart, err := cartdatabase.ViewCart(userID)
 	if err != nil {
 		return nil, errors.NewInternalServerError("Error while fetching the cart")
 	}
-	return &userCart.Items, nil
+	return userCart, nil
 }
 
 //Checkout : To checkout all the given items in the cart
-func Checkout(userID string) {
+func Checkout(req *http.Request, userID string) (*domain.CheckoutCart, *errors.RestError) {
+	userCart, err := cartdatabase.ViewCart(userID)
+	if err != nil {
+		return nil, errors.NewInternalServerError("Error while fetching the cart")
+	}
+	response := &domain.CheckoutCart{}
+	deliveryTime := time.Now()
+	deliveryTime.Format("01-02-2006")
+	deliveryTime = deliveryTime.AddDate(0, 0, 10)
+	response.DeliveryTime = deliveryTime.String()
+	for i := 0; i < len(userCart.Detail); i++ {
+		currentItem := userCart.Detail[i]
+		err := product.ItemSerivce.BuyItem(req, currentItem.StoreID, currentItem.ItemID)
+		if err != nil {
+			return nil, err
+		}
+		response.TotalPrice += currentItem.Price
+		response.Items = append(response.Items, currentItem)
 
+	}
+	return response, nil
 }

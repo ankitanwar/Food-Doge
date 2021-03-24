@@ -7,8 +7,8 @@ import (
 	"log"
 	"net/http"
 
-	connect "github.com/ankitanwar/Food-Doge/stores/client/connect"
-	storespb "github.com/ankitanwar/Food-Doge/stores/proto"
+	connect "github.com/ankitanwar/Food-Doge/food/client/connect"
+	storespb "github.com/ankitanwar/Food-Doge/food/proto"
 	"github.com/gin-gonic/gin"
 )
 

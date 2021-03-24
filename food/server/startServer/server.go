@@ -4,8 +4,8 @@ import (
 	"log"
 	"net"
 
-	storespb "github.com/ankitanwar/Food-Doge/stores/proto"
-	"github.com/ankitanwar/Food-Doge/stores/server/services"
+	storespb "github.com/ankitanwar/Food-Doge/food/proto"
+	"github.com/ankitanwar/Food-Doge/food/server/services"
 	"google.golang.org/grpc"
 )
 
@@ -17,7 +17,7 @@ func StartServer() {
 	}
 	opts := []grpc.ServerOption{}
 	srv := grpc.NewServer(opts...)
-	storespb.RegisterStoresServiceServer(srv, &services.StoreService{})
+	storespb.RegisterStoresServiceServer(srv, &services.FoodService{})
 	err = srv.Serve(lis)
 	if err != nil {
 		log.Fatalln("Unable To Listen")

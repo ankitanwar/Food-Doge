@@ -4,22 +4,14 @@ import (
 	"net/http"
 
 	"github.com/ankitanwar/Food-Doge/cart/services"
-	product "github.com/ankitanwar/Food-Doge/middleware/Products"
-	oauth "github.com/ankitanwar/Food-Doge/middleware/auth"
-	"github.com/ankitanwar/GoAPIUtils/errors"
+	oauth "github.com/ankitanwar/Shop-PopCorn/Middleware/oAuth"
+	"github.com/ankitanwar/Shop-PopCorn/Middleware/user"
 	"github.com/gin-gonic/gin"
 )
 
 func getCallerID(request *http.Request) string {
-	userID := request.Header.Get("X-Caller-Id")
+	userID := request.Header.Get("X-Caller-ID")
 	return userID
-}
-
-func getItemID(itemID string) (string, *errors.RestError) {
-	if itemID == "" {
-		return "", errors.NewBadRequest("Invalid Item ID")
-	}
-	return itemID, nil
 }
 
 //AddToCart : To add the given item into the cart
@@ -29,17 +21,9 @@ func AddToCart(c *gin.Context) {
 		return
 	}
 	userID := getCallerID(c.Request)
-	itemID, getItemErr := getItemID(c.Param("itemID"))
-	if getItemErr != nil {
-		c.JSON(getItemErr.Status, getItemErr.Message)
-		return
-	}
-	details, err := product.ItemSerivce.GetItemDetails(itemID)
-	if err != nil {
-		c.JSON(err.Status, err.Message)
-		return
-	}
-	err = services.AddToCart(userID, itemID, details)
+	itemID := c.Param("itemID")
+	storeID := c.Param("storeID")
+	err := services.AddToCart(userID, storeID, itemID)
 	if err != nil {
 		c.JSON(err.Status, err.Message)
 		return
@@ -56,11 +40,8 @@ func RemoveFromCart(c *gin.Context) {
 		return
 	}
 	userID := getCallerID(c.Request)
-	itemID, err := getItemID(c.Param("itemID"))
-	if err != nil {
-		c.JSON(err.Status, err.Message)
-	}
-	err = services.RemoveFromCart(userID, itemID)
+	itemID := c.Param("itemID")
+	err := services.RemoveFromCart(userID, itemID)
 	if err != nil {
 		c.JSON(err.Status, err.Message)
 		return
@@ -87,5 +68,24 @@ func ViewCart(c *gin.Context) {
 
 //Checkout : To checkout all the items from the cart
 func Checkout(c *gin.Context) {
-
+	// if err := oauth.AuthenticateRequest(c.Request); err != nil {
+	// 	c.JSON(err.Status, err)
+	// 	return
+	// }
+	addressID := c.Param("addressID")
+	address, err := user.GetUserAddress.GetAddress(c.Request, addressID)
+	if err != nil {
+		c.JSON(err.Status, err.Message)
+	}
+	userID := getCallerID(c.Request)
+	response, err := services.Checkout(c.Request, userID)
+	if err != nil {
+		c.JSON(err.Status, err.Message)
+	}
+	response.Country = address.Country
+	response.Street = address.Street
+	response.State = address.State
+	response.Phone = address.Phone
+	response.HouseNumber = address.HouseNumber
+	c.JSON(http.StatusAccepted, response)
 }

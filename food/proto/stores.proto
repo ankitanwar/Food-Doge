@@ -2,7 +2,7 @@ syntax="proto3";
 
 package stores;
 
-option go_package=".;storespb";
+option go_package=".;foodpb";
 
 message food{
     string itemName=1;
@@ -132,6 +132,17 @@ message getItemDetailsResponse{
     food details=1;
 }
 
+message checkOutRequest{
+    string storeID=1;
+    string itemID=2;
+}
+
+message checkOutResponse{
+    string ItemName=1;
+    int64 Price=2;
+    string deliveryTime=3;
+}
+
 service storesService{
     rpc CreateStore(createStoreRequest) returns (createStoreResponse);
     rpc explore(exploreOutletsRequest) returns (stream exporeOutletsResponse);
@@ -144,5 +155,6 @@ service storesService{
     rpc deleteStore (deleteStoreRequest) returns (deleteStoreResponse);
     rpc ViewItemOfStore (viewParticularStoreRequest) returns (stream viewParticularStoreResponse);
     rpc GetItemDetail (getItemDetailsRequest)returns (getItemDetailsResponse);
+    rpc Checkout (checkOutRequest) returns (checkOutResponse);
 
 }
