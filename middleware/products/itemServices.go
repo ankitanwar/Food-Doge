@@ -10,8 +10,15 @@ import (
 	"github.com/mercadolibre/golang-restclient/rest"
 )
 
+const (
+	headerXCallerID      = "X-Caller-ID"
+	headerXAccessTokenID = "X-Token-ID"
+)
+
 var (
+	headers    = make(http.Header)
 	restClient = rest.RequestBuilder{
+		Headers: headers,
 		BaseURL: "http://localhost:8070",
 		Timeout: 100 * time.Millisecond,
 	}
@@ -26,6 +33,23 @@ type itemServiceInterface interface {
 type itemServicesStruct struct {
 }
 
+//GetCallerID : To get the caller id from the url
+func GetCallerID(request *http.Request) string {
+	if request == nil {
+		return ""
+	}
+	callerID := request.Header.Get(headerXCallerID)
+	return callerID
+}
+
+//GetAccessID: To get the caller id from the url
+func GetAccessID(request *http.Request) string {
+	if request == nil {
+		return ""
+	}
+	accessID := request.Header.Get(headerXAccessTokenID)
+	return accessID
+}
 func (item *itemServicesStruct) GetItemDetails(storeID, itemID string) (*Details, *errors.RestError) {
 	res := restClient.Get(fmt.Sprintf("/itemDetail/%s/%s", storeID, itemID))
 	if res.Response == nil || res == nil {
@@ -44,6 +68,10 @@ func (item *itemServicesStruct) GetItemDetails(storeID, itemID string) (*Details
 }
 
 func (item *itemServicesStruct) BuyItem(req *http.Request, storeID, itemID string) *errors.RestError {
+	userID := GetCallerID(req)
+	tokenID := GetAccessID(req)
+	headers.Set(headerXCallerID, userID)
+	headers.Set(headerXAccessTokenID, tokenID)
 	res := restClient.Post(fmt.Sprintf("/checkout/%s/%s", storeID, itemID), nil)
 	if res.StatusCode < 299 {
 		details := &Order{}

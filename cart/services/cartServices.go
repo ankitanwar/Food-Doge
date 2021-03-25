@@ -66,7 +66,7 @@ func Checkout(req *http.Request, userID string) (*domain.CheckoutCart, *errors.R
 		}
 		response.TotalPrice += currentItem.Price
 		response.Items = append(response.Items, currentItem)
-
+		cartdatabase.RemoveFromCart(userID, currentItem.ItemID)
 	}
 	return response, nil
 }
