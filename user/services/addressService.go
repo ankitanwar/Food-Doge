@@ -1,6 +1,8 @@
 package services
 
 import (
+	"fmt"
+
 	addressDB "github.com/ankitanwar/Food-Doge/user/databasource/mongoDB"
 	"github.com/ankitanwar/Food-Doge/user/domain/users"
 	"github.com/ankitanwar/GoAPIUtils/errors"
@@ -58,7 +60,9 @@ func (userAddress *addressServiceStruct) GetAddressWithID(userID, addressID stri
 		return nil, errors.NewBadRequest("InValid Address Id")
 	}
 	addresses, err := addressDB.GetUserAddress(userID)
+	fmt.Println("The value of userID is", userID)
 	if err != nil {
+		fmt.Println("The vaue of error is", err)
 		return nil, errors.NewInternalServerError("Error While Fetching The Address")
 	}
 	for i := 0; i < len(addresses.List); i++ {

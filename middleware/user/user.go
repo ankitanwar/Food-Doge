@@ -21,6 +21,7 @@ var (
 	oauthRestClient = rest.RequestBuilder{
 		BaseURL: "http://localhost:8081",
 		Timeout: 200 * time.Millisecond,
+		Headers: headers,
 	}
 	//GetUserAddress : To get the address of the given user
 	GetUserAddress userInterace = &user{}
@@ -56,6 +57,7 @@ type SpecificAddress struct {
 	State       string `json:"state"`
 	Country     string `json:"country"`
 	Phone       string `json:"phone"`
+	Pincode     int64  `json:"pincode"`
 }
 
 func (u *user) GetAddress(request *http.Request, addressID string) (*SpecificAddress, *errors.RestError) {
@@ -63,6 +65,7 @@ func (u *user) GetAddress(request *http.Request, addressID string) (*SpecificAdd
 	accessTokenID := GetAccessID(request)
 	headers.Set(headerXCallerID, userID)
 	headers.Set(headerXAccessTokenID, accessTokenID)
+	fmt.Println("The value of accessTokenID and userID is", accessTokenID, userID)
 	response := oauthRestClient.Get(fmt.Sprintf("/user/specificaddress/%s", addressID))
 	if response == nil || response.Response == nil {
 		return nil, errors.NewNotFound("Not found")

@@ -1,6 +1,7 @@
 package order
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -38,8 +39,8 @@ func GetAccessID(request *http.Request) string {
 	if request == nil {
 		return ""
 	}
-	callerID := request.Header.Get(headerXAccessTokenID)
-	return callerID
+	accessID := request.Header.Get(headerXAccessTokenID)
+	return accessID
 }
 
 type PlaceOrder struct {
@@ -76,12 +77,11 @@ func PlaceOrders(req *http.Request, storeID string, order *foodpb.OrderFoodRespo
 
 func PlaceOrderWithStore(req *http.Request, order *PlaceOrder, storeID string) *errors.RestError {
 	userID := GetCallerID(req)
-	tokenID := GetCallerID(req)
+	tokenID := GetAccessID(req)
 	headers.Set(headerXCallerID, userID)
 	headers.Set(headerXAccessTokenID, tokenID)
-	url := "/orders/"
-	url += storeID
-	response := oauthRestClient.Post(url, order)
+	response := oauthRestClient.Post(fmt.Sprintf("/orders/%s", storeID), order)
+	fmt.Println("The value of response is", response.String())
 	if response == nil || response.Response == nil {
 		errors.NewNotFound("Not found")
 	}

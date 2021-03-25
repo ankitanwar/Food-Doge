@@ -13,6 +13,7 @@ import (
 
 func getUserid(request *http.Request) (string, *errors.RestError) {
 	userID := request.Header.Get("X-Caller-ID")
+	fmt.Println("The value of userID is", userID)
 	if userID == "" {
 		return "", errors.NewBadRequest("Invalid User ID")
 	}
@@ -148,7 +149,6 @@ func AddAddress(c *gin.Context) {
 	}
 	address := &users.UserAddress{}
 	bindErr := c.ShouldBindJSON(address)
-	fmt.Println("The value of bindErr is", bindErr)
 	if bindErr != nil {
 		c.JSON(http.StatusBadRequest, "Error while binding to the json")
 		return
@@ -167,11 +167,11 @@ func AddAddress(c *gin.Context) {
 }
 
 func GetAddressWithID(c *gin.Context) {
-	// err := auth.AuthenticateRequest(c.Request)
-	// if err != nil {
-	// 	c.JSON(err.Status, err.Message)
-	// 	return
-	// }
+	err := auth.AuthenticateRequest(c.Request)
+	if err != nil {
+		c.JSON(err.Status, err.Message)
+		return
+	}
 	addressID := c.Param("addressID")
 	userID, err := getUserid(c.Request)
 	if err != nil {

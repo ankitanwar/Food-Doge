@@ -6,6 +6,7 @@ type ReturnAddress struct {
 	State   string `json:"state"`
 	Country string `json:"country"`
 	Phone   string `json:"phone"`
+	Pincode int64  `json:"pincode"`
 }
 
 type ReturnUserDetails struct {

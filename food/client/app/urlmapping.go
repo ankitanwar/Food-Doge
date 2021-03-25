@@ -13,6 +13,6 @@ func UrlMapping() {
 	router.DELETE("/food/:storeID/:itemID", controllers.FoodController.DeleteFoodItem)
 	router.GET("/food/all/:storeID", controllers.FoodController.GetAllItems)
 	router.GET("/itemDetail/:storeID/:itemID", controllers.FoodController.GetItemDetails)
-	router.POST("/buy/food/:storeID/:itemID", controllers.FoodController.OrderFoodItem)
+	router.POST("/buy/food/:storeID/:itemID/:addressID", controllers.FoodController.OrderFoodItem)
 	router.POST("/checkout/:storeID/:itemID", controllers.FoodController.CheckOut)
 }

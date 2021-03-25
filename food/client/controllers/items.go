@@ -8,7 +8,9 @@ import (
 
 	connect "github.com/ankitanwar/Food-Doge/food/client/connect"
 	foodpb "github.com/ankitanwar/Food-Doge/food/proto"
+	auth "github.com/ankitanwar/Food-Doge/middleware/auth"
 	orders "github.com/ankitanwar/Food-Doge/middleware/orders"
+	"github.com/ankitanwar/Food-Doge/middleware/user"
 	"github.com/gin-gonic/gin"
 )
 
@@ -58,6 +60,10 @@ func (controller *foodControllerSturct) FilterFood(c *gin.Context) {
 }
 
 func (controller *foodControllerSturct) AddNewItem(c *gin.Context) {
+	if err := auth.AuthenticateRequest(c.Request); err != nil {
+		c.JSON(err.Status, err.Message)
+		return
+	}
 	userID := getUserID(c.Request)
 	storeID := c.Param("storeID")
 	itemDetails := &foodpb.Food{}
@@ -77,7 +83,10 @@ func (controller *foodControllerSturct) AddNewItem(c *gin.Context) {
 }
 
 func (controller *foodControllerSturct) UpdateFoodDetails(c *gin.Context) {
-	//need to implement authentication
+	if err := auth.AuthenticateRequest(c.Request); err != nil {
+		c.JSON(err.Status, err.Message)
+		return
+	}
 	userID := getUserID(c.Request)
 	storeID := c.Param("storeID")
 	itemID := c.Param("itemID")
@@ -96,6 +105,10 @@ func (controller *foodControllerSturct) UpdateFoodDetails(c *gin.Context) {
 }
 
 func (controller *foodControllerSturct) DeleteFoodItem(c *gin.Context) {
+	if err := auth.AuthenticateRequest(c.Request); err != nil {
+		c.JSON(err.Status, err.Message)
+		return
+	}
 	userID := getUserID(c.Request)
 	storeID := c.Param("storeID")
 	itemID := c.Param("itemID")
@@ -110,6 +123,11 @@ func (controller *foodControllerSturct) DeleteFoodItem(c *gin.Context) {
 }
 
 func (controller *foodControllerSturct) OrderFoodItem(c *gin.Context) {
+	addressID := c.Param("addressID")
+	address, addressErr := user.GetUserAddress.GetAddress(c.Request, addressID)
+	if addressErr != nil {
+		c.JSON(addressErr.Status, addressErr.Message)
+	}
 	storeId := c.Param("storeID")
 	itemID := c.Param("itemID")
 	request := &foodpb.OrderFoodRequest{
@@ -121,6 +139,11 @@ func (controller *foodControllerSturct) OrderFoodItem(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, "Unable To Order The food")
 		return
 	}
+	response.CustomerHouseNo = address.HouseNumber
+	response.CustomerPhoneNumber = address.Phone
+	response.CustomerStreet = address.Street
+	response.CutomerState = address.State
+	response.Pincode = address.Pincode
 	informStoreErr := orders.PlaceOrders(c.Request, storeId, response)
 	if informStoreErr != nil {
 		c.JSON(informStoreErr.Status, informStoreErr.Message)
@@ -174,6 +197,10 @@ func (controller *foodControllerSturct) GetAllItems(c *gin.Context) {
 
 }
 func (controller *foodControllerSturct) CheckOut(c *gin.Context) {
+	if err := auth.AuthenticateRequest(c.Request); err != nil {
+		c.JSON(err.Status, err.Message)
+		return
+	}
 	storeID := c.Param("storeID")
 	itemID := c.Param("itemID")
 	request := &foodpb.CheckOutRequest{ItemID: itemID, StoreID: storeID}

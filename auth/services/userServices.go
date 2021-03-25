@@ -74,6 +74,12 @@ func ValidateAccessToken(userID string, token string) (*domain.AccessToken, *err
 		if err != nil {
 			return nil, errors.NewInternalServerError("Error WhileFethcing The Token")
 		}
+		if response.UserID != userID {
+			return nil, errors.NewBadRequest("Invalid UserID ")
+		}
+		if response.Token != token {
+			return nil, errors.NewBadRequest("Token Doesn't Match")
+		}
 		return response, nil
 	}
 	return nil, errors.NewBadRequest("Please Enter The Valid Access Token")

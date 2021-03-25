@@ -2,13 +2,13 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
 
 	connect "github.com/ankitanwar/Food-Doge/food/client/connect"
 	storespb "github.com/ankitanwar/Food-Doge/food/proto"
+	auth "github.com/ankitanwar/Food-Doge/middleware/auth"
 	"github.com/gin-gonic/gin"
 )
 
@@ -32,16 +32,17 @@ func getUserID(req *http.Request) string {
 }
 
 func (controller *storeControllerStrcut) CreateNewStore(c *gin.Context) {
-	//need to implement authentication also
+	if err := auth.AuthenticateRequest(c.Request); err != nil {
+		c.JSON(err.Status, err.Message)
+		return
+	}
 	userID := getUserID(c.Request)
 	details := &storespb.CreateStoreRequest{}
 	details.UserID = userID
-	fmt.Println("The value of user ID is", userID)
 	err := c.ShouldBindJSON(details)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, "Error While Fetching The Store Details")
 	}
-	fmt.Println("The value of userID is", details.UserID)
 	response, err := connect.Client.CreateStore(context.Background(), details)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
@@ -74,7 +75,10 @@ func (controller *storeControllerStrcut) ShowStores(c *gin.Context) {
 
 }
 func (controller *storeControllerStrcut) UpdateStoreDetails(c *gin.Context) {
-	//need to implement authentication
+	if err := auth.AuthenticateRequest(c.Request); err != nil {
+		c.JSON(err.Status, err.Message)
+		return
+	}
 	userID := getUserID(c.Request)
 	storeID := c.Param("storeID")
 	receivedDetails := &storespb.UpdateStoreRequest{}
@@ -94,7 +98,10 @@ func (controller *storeControllerStrcut) UpdateStoreDetails(c *gin.Context) {
 }
 
 func (controller *storeControllerStrcut) DeleteStore(c *gin.Context) {
-	//need to implement authentication
+	if err := auth.AuthenticateRequest(c.Request); err != nil {
+		c.JSON(err.Status, err.Message)
+		return
+	}
 	userID := getUserID(c.Request)
 	storeID := c.Param("storeID")
 	request := &storespb.DeleteStoreRequest{StoreID: storeID, UserID: userID}
