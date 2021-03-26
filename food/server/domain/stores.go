@@ -34,3 +34,20 @@ func (details *Store) CheckForError() error {
 	return nil
 
 }
+
+type StoreLocation struct {
+	Location                 string                   `json:"location" bson:"_id"`
+	StoreLocationInformation StoreLocationInformation `json:"stores" bson:"stores"`
+}
+type StoreLocationInformation struct {
+	StoreID     string `json:"storeID" bson:"storeID"`
+	Name        string `json:"name" bson:"name"`
+	Description string `json:"description" bson:"description"`
+	Street      string `json:"street" bson:"street"`
+	State       string `json:"state" bson:"state"`
+}
+
+type StoreExplore struct {
+	Location                 string                     `json:"location" bson:"_id"`
+	StoreLocationInformation []StoreLocationInformation `json:"stores" bson:"stores"`
+}

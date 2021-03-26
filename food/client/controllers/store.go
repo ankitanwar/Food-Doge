@@ -32,10 +32,10 @@ func getUserID(req *http.Request) string {
 }
 
 func (controller *storeControllerStrcut) CreateNewStore(c *gin.Context) {
-	if err := auth.AuthenticateRequest(c.Request); err != nil {
-		c.JSON(err.Status, err.Message)
-		return
-	}
+	// if err := auth.AuthenticateRequest(c.Request); err != nil {
+	// 	c.JSON(err.Status, err.Message)
+	// 	return
+	// }
 	userID := getUserID(c.Request)
 	details := &storespb.CreateStoreRequest{}
 	details.UserID = userID
@@ -67,7 +67,9 @@ func (controller *storeControllerStrcut) ShowStores(c *gin.Context) {
 			break
 		}
 		if err != nil {
-			log.Fatalln("Error While Fetching The store Details")
+			log.Println("Error While Fetching The store Details", err)
+			c.JSON(http.StatusBadRequest, "Unable To Search The Stores")
+			return
 		} else {
 			c.JSON(http.StatusOK, details)
 		}

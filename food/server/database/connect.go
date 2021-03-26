@@ -15,7 +15,8 @@ var (
 	Client *mongo.Client
 
 	//Collection :- grpc Collection Database
-	collection *mongo.Collection
+	collection      *mongo.Collection
+	storeCollection *mongo.Collection
 )
 
 func init() {
@@ -33,5 +34,6 @@ func init() {
 		panic(err)
 	}
 	collection = Client.Database("Food").Collection("stores")
+	storeCollection = Client.Database("Food").Collection("storesLocation")
 
 }
