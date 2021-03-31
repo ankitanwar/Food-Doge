@@ -33,15 +33,6 @@ func (itemsDb *ItemsDB) AddItemToStore(storeID primitive.ObjectID, userID string
 
 }
 
-func (itemdb *ItemsDB) FilterItems(storeID primitive.ObjectID, price int64, cuisine, vegetarian, name string) (*mongo.Cursor, error) {
-	filter := bson.D{{"_id", storeID}, {"products.itemName", name}, {"products.vegetarian", vegetarian}, {"products.cuisine", cuisine}}
-	result, err := collection.Find(context.Background(), filter)
-	if err != nil {
-		return nil, err
-	}
-	return result, err
-}
-
 func (Itemsdb *ItemsDB) FetchAllItems(storeID primitive.ObjectID) *mongo.SingleResult {
 	filter := bson.M{"_id": storeID}
 	result := collection.FindOne(context.Background(), filter)

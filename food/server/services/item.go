@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"time"
 
 	storespb "github.com/ankitanwar/Food-Doge/food/proto"
@@ -75,36 +74,45 @@ func (service *FoodService) FilterDish(req *storespb.FilterFoodRequest, stream s
 	storeID := req.GetStoreID()
 	storeKey, err := primitive.ObjectIDFromHex(storeID)
 	if err != nil {
-		return errors.New("Please Enter The valid StoreID")
+		return errors.New("Unable To Decode The store key")
 	}
-	filterByCusine := "*"
-	// filterByVegetarian := false
-	filterByName := "*"
-	var filterByPrice int64 = 0
-	if req.Price > 0 {
-		filterByPrice = req.Price
-	}
-	if req.Cuisine != "" {
-		filterByCusine = req.Cuisine
-	}
-	// if req.Vegetarian == true {
-	// 	filterByVegetarian = true
-	// }
-	if req.Name != "" {
-		filterByName = req.Name
-	}
-	details, err := itemDB.FilterItems(storeKey, filterByPrice, filterByCusine, "", filterByName)
+	filterPrice := req.GetPrice()
+	filterCuisine := req.GetCuisine()
+	filtterVegetarian := req.GetVegetarian()
+	filterName := req.GetName()
+	items := &domain.ListALlProducts{}
+	err = itemDB.FetchAllItems(storeKey).Decode(items)
 	if err != nil {
-		log.Println("Unable To Filter The details", err)
-		return errors.New("Unable To Filter The Products")
+		return errors.New("Unable To Filter The Items Of The Store")
 	}
-	items := []domain.Items{}
-	details.All(context.Background(), items)
-	for i := 0; i < len(items); i++ {
-		current := items[i]
-		fmt.Println("the value of current is", current)
+	fmt.Println("The value of currentVegetarian is", filtterVegetarian)
+	for i := 0; i < len(items.AllProducts); i++ {
+		currentItem := items.AllProducts[i]
+		if filterPrice != 0 && currentItem.Price != filterPrice {
+			continue
+
+		} else if filterCuisine != "" && currentItem.Cuisine != filterCuisine {
+			continue
+		} else if filtterVegetarian == true && currentItem.Vegetarain == false {
+			continue
+		} else if filterName != "" && currentItem.ItemName != filterName {
+			continue
+		} else {
+			details := &storespb.Food{
+				ItemName:    currentItem.ItemName,
+				Description: currentItem.Description,
+				Vegetarian:  currentItem.Vegetarain,
+				Price:       currentItem.Price,
+				Cuisine:     currentItem.Cuisine,
+			}
+			response := &storespb.FilterFoodResponse{
+				Filtered: details,
+			}
+			stream.Send(response)
+		}
 	}
 	return nil
+
 }
 
 func (service *FoodService) DeleteItem(ctx context.Context, req *storespb.DeleteItemRequest) (*storespb.DeleteItemResponse, error) {
