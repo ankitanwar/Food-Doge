@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/ankitanwar/GoAPIUtils/errors"
-	uuid "github.com/uuid"
+	uuid "github.com/satori/go.uuid"
 )
 
 //User : User and its values
