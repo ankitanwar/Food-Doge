@@ -42,6 +42,18 @@ RESTful microservices to explore the nearby restaurants and their famous cuisine
 | Delete Food Item From The Store | Allowing Restaurants Owner To Delete Food Item From The Store |
 | Get Every Item Of The Store | To Explore All The Food Items Of The Particular Store |
 | Get Specific Food Item Of The Store | To View The Specific Food Item Of the Store|
+
+<br></br>
+
+<b>Store Services</b>
+
+| Feature  | Description  |
+|----------|:-------------|
+| View Orders| To View All The Placed Orders |
+| Receive Orders | To Receive The Orders By The Customers |
+| Order Completed | To Delete The Order Once Completed  |
+
+
 <br></br>
 
 
