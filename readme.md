@@ -18,7 +18,8 @@ RESTful microservices to explore the nearby restaurants and their famous cuisine
 
 <br></br>
 
-<b>Cart Service</b>
+<b>Cart Service
+</b>
 
 | Feature  | Description  |
 |----------|:-------------|
