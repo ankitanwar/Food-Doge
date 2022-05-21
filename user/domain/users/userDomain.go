@@ -58,10 +58,7 @@ func (address *UserAddress) ValidateAddress() *errors.RestError {
 }
 
 func (address *UserAddress) GenerateUniqueAddressID() (string, *errors.RestError) {
-	id, err := uuid.NewV4()
-	if err != nil {
-		return "", errors.NewInternalServerError("Error While Generating The Address")
-	}
+	id := uuid.NewV4()
 	stringID := id.String()
 	return stringID, nil
 }
