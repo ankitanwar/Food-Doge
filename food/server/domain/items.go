@@ -3,7 +3,7 @@ package domain
 import (
 	"errors"
 
-	uuid "github.com/uuid"
+	uuid "github.com/satori/go.uuid"
 )
 
 type ListALlProducts struct {
@@ -29,10 +29,7 @@ func (details *Items) CheckItemDetails() error {
 }
 
 func (details *Items) GenerateUniqueID() (string, error) {
-	id, err := uuid.NewV4()
-	if err != nil {
-		return "", err
-	}
+	id, := uuid.NewV4()
 	stringID := id.String()
 	return stringID, nil
 }
